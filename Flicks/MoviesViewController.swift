@@ -12,6 +12,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
     @IBOutlet weak var tableView: UITableView!
     
+    // create an optional to hold the movies dictionary
+    var movies: [NSDictionary]?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -30,9 +33,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK: - Network Request
     
     func requestData() {
-        let apiKey = "9c8b8a24a248fed2e25eb1f8d2f29d13";
         
-        let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")        
+        let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=9c8b8a24a248fed2e25eb1f8d2f29d13")
         
         let request = URLRequest(url: url!)
         let session = URLSession(
@@ -49,6 +51,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                         with: data, options:[]) as? NSDictionary {
                         print("responseDictionary: \(responseDictionary)")
                         
+                        self.movies = responseDictionary["results"] as! [NSDictionary]
+                        
+                        // reload our table view
+                        self.tableView.reloadData()
+                        
                         // Recall there are two fields in the response dictionary, 'meta' and 'response'.
                         // This is how we get the 'response' field
 //                        let responseFieldDictionary = responseDictionary["response"] as! NSDictionary
@@ -64,15 +71,23 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK: - UITableViewDataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 20;
+        
+        // If movies is not nil, then assign it to movies
+        if let movies = movies {
+            return movies.count
+        } else {
+            return 0
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
         
-        cell.textLabel?.text = "row \(indexPath.row)"
-        print("row \(indexPath.row)")
+        let movie = movies![indexPath.row]
+        let title = movie["title"] as! String
         
+        cell.textLabel?.text = title
+         
         return cell
     }
 
