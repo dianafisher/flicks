@@ -81,12 +81,19 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
         
         let movie = movies![indexPath.row]
         let title = movie["title"] as! String
+        let overview = movie["overview"] as! String
+        let posterPath = movie["poster_path"] as! String
         
-        cell.textLabel?.text = title
+        let baseUrl = "http://image.tmdb.org/t/p/w500"
+        
+        let imageUrl = NSURL(string: baseUrl + posterPath)
+        
+        cell.titleLabel.text = title
+        cell.overviewLabel.text = overview
          
         return cell
     }
@@ -102,5 +109,3 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     */
 
 }
-
-//TMDB_API_KEY = @"9c8b8a24a248fed2e25eb1f8d2f29d13";
