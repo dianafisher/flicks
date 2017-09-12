@@ -18,11 +18,47 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Do any additional setup after loading the view.
         tableView.dataSource = self
         tableView.delegate = self
+        
+        self.requestData()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    // MARK: - Network Request
+    
+    func requestData() {
+        let apiKey = "9c8b8a24a248fed2e25eb1f8d2f29d13";
+        
+        let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")        
+        
+        let request = URLRequest(url: url!)
+        let session = URLSession(
+            configuration: URLSessionConfiguration.default,
+            delegate:nil,
+            delegateQueue:OperationQueue.main
+        )
+        
+        let task : URLSessionDataTask = session.dataTask(
+            with: request as URLRequest,
+            completionHandler: { (data, response, error) in
+                if let data = data {
+                    if let responseDictionary = try! JSONSerialization.jsonObject(
+                        with: data, options:[]) as? NSDictionary {
+                        print("responseDictionary: \(responseDictionary)")
+                        
+                        // Recall there are two fields in the response dictionary, 'meta' and 'response'.
+                        // This is how we get the 'response' field
+//                        let responseFieldDictionary = responseDictionary["response"] as! NSDictionary
+                        
+                        // This is where you will store the returned array of posts in your posts property
+                        // self.feeds = responseFieldDictionary["posts"] as! [NSDictionary]
+                    }
+                }
+        });
+        task.resume()
     }
     
     // MARK: - UITableViewDataSource
@@ -51,3 +87,5 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     */
 
 }
+
+//TMDB_API_KEY = @"9c8b8a24a248fed2e25eb1f8d2f29d13";
