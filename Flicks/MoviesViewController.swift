@@ -52,7 +52,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                         with: data, options:[]) as? NSDictionary {
                         print("responseDictionary: \(responseDictionary)")
                         
-                        self.movies = responseDictionary["results"] as! [NSDictionary]
+                        self.movies = responseDictionary["results"] as? [NSDictionary]
                         
                         // reload our table view
                         self.tableView.reloadData()
@@ -104,14 +104,23 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let cell = sender as! UITableViewCell
+        let indexPath = tableView.indexPath(for: cell)
+        let movie = movies?[indexPath!.row]
+        
+        let detailViewController = segue.destination as! DetailViewController
+        detailViewController.movie = movie
+        
+        
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
     }
-    */
+    
 
 }
