@@ -19,8 +19,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         
+        // Create the now playing navigation controller
         let nowPlayingNavigationController = navigationControllerForEndpoint("now_playing")
+        
+        // Set the title and image of the now playing navigatinon controller
+        nowPlayingNavigationController.tabBarItem.title = "Now Playing"
+        nowPlayingNavigationController.tabBarItem.image = UIImage(named: "tickets")
+        
+        // Create the top rated navigation controller
         let topRatedNavigationController = navigationControllerForEndpoint("top_rated")
+        
+        // Set the title and image of the top rated navigatinon controller
+        topRatedNavigationController.tabBarItem.title = "Top Rated"
+        topRatedNavigationController.tabBarItem.image = UIImage(named: "star")
         
         // Create a tab bar controller.
         let tabBarController = UITabBarController()
@@ -46,8 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let navigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
         let viewController = navigationController.topViewController as! MoviesViewController
-        viewController.endpoint = endpoint
-
+        
+        viewController.endpoint = endpoint        
+        
         return navigationController
     }
 
