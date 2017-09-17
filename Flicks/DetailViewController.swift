@@ -13,12 +13,19 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var posterImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var overviewLabel: UILabel!
+    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var infoView: UIView!
     
-    var movie: NSDictionary!
+    var movie: NSDictionary!  // implicitly unwrapped
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // set the content size of our scroll view
+        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
+        
         print(movie)
         
         let title = movie["title"] as? String
@@ -27,7 +34,16 @@ class DetailViewController: UIViewController {
         let overview = movie["overview"] as? String
         overviewLabel.text = overview
         
-        // Do any additional setup after loading the view.
+        let baseUrl = "http://image.tmdb.org/t/p/w500"
+        
+        // use if let to safely set the posterImageView image from the poster_path
+        if let posterPath = movie["poster_path"] as? String {
+            // posterPath is now guaranteed to not be nil.
+            let imageUrl = NSURL(string: baseUrl + posterPath)
+            posterImageView.setImageWith(imageUrl! as URL)
+        }
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
