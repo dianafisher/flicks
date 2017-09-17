@@ -27,8 +27,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         
-        // hide the network error view
+        // set the networkErrorView hidden initially
         networkErrorView.isHidden = true
+        
+        // initialize a UIRefreshControl
+        refreshControl = UIRefreshControl()
+        
+        // bind refreshControlAction as the target for our refreshControl
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_refreshControl:)), for: UIControlEvents.valueChanged)
+        
+        // add the refresh control to the table view        
+        tableView.refreshControl = refreshControl
         
         // make the network request
         self.requestData()
@@ -81,6 +90,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                         // reload our table view
                         self.tableView.reloadData()
                         
+                        // update the refreshControl
+                        self.refreshControl.endRefreshing()
+                        
                     }
                 } else if let error = error {
                     print("Error: \(error)")
@@ -91,6 +103,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 }
         });
         task.resume()
+    }
+    
+    // MARK: - UIRefreshControl action
+    
+    func refreshControlAction(_refreshControl: UIRefreshControl) {
+        // make the network request
+        requestData()
     }
     
     // MARK: - UITableViewDataSource
