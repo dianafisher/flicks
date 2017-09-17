@@ -16,7 +16,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        window = UIWindow(frame: UIScreen.main.bounds)
+        
+        let nowPlayingNavigationController = navigationControllerForEndpoint("now_playing")
+        let topRatedNavigationController = navigationControllerForEndpoint("top_rated")
+        
+        // Create a tab bar controller.
+        let tabBarController = UITabBarController()
+        
+        // Link each navigation controller
+        tabBarController.viewControllers = [nowPlayingNavigationController, topRatedNavigationController]
+        
+        // Set the tab bar controller as the root view controller.
+        window?.rootViewController = tabBarController
+        
+        // Show the window and make it the key window
+        window?.makeKeyAndVisible()
+        
         return true
+    }
+    
+    /*
+     Creates a UINavigationController for the specified endpoint
+     */
+    func navigationControllerForEndpoint(_ endpoint: String) -> UINavigationController {
+        // Get our storyboard
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let navigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
+        let viewController = navigationController.topViewController as! MoviesViewController
+        viewController.endpoint = endpoint
+
+        return navigationController
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

@@ -19,11 +19,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // create an optional to hold the movies dictionary
     var movies: [NSDictionary]?
     var refreshControl: UIRefreshControl!
+    var endpoint: String!
+    let apiKey:String = "9c8b8a24a248fed2e25eb1f8d2f29d13"
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        // set up the table view data source and delegate
         tableView.dataSource = self
         tableView.delegate = self
         
@@ -36,7 +38,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // bind refreshControlAction as the target for our refreshControl
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_refreshControl:)), for: UIControlEvents.valueChanged)
         
-        // add the refresh control to the table view        
+        // add the refresh control to the table view
         tableView.refreshControl = refreshControl
         
         // make the network request
@@ -53,56 +55,58 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func requestData() {
         
-        let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=9c8b8a24a248fed2e25eb1f8d2f29d13")
-        
-        let request = URLRequest(url: url!)
         let session = URLSession(
             configuration: URLSessionConfiguration.default,
             delegate:nil,
             delegateQueue:OperationQueue.main
         )
         
-        //let frame = CGRect(x: 200, y: 200, width: 30, height: 30)
-        //let activityIndicator = NVActivityIndicatorView(frame: frame, type: NVActivityIndicatorType.ballScaleRippleMultiple, color: UIColor.white)
-        //activityIndicator.backgroundColor = UIColor.red
-        //self.view .addSubview(activityIndicator)
-        //activityIndicator.startAnimating()
+        // print("https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)")
         
-        // Display HUD right before the request is made
-        MBProgressHUD.showAdded(to: self.view, animated: true)
+        if let url = URL(string:"https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)")
+        {
+            let request = URLRequest(url: url)
+            // Display HUD right before the request is made
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+            
+            let task : URLSessionDataTask = session.dataTask(
+                with: request as URLRequest,
+                completionHandler: { (data, response, error) in
+                    
+                    // Hide HUD once the network request comes back (must be done on main UI thread)
+                    DispatchQueue.main.async(execute: {
+                        MBProgressHUD.hide(for: self.view, animated: true)
+                    })
+                    
+                    if let data = data {
+                        if let responseDictionary = try! JSONSerialization.jsonObject(
+                            with: data, options:[]) as? NSDictionary {
+                            print("responseDictionary: \(responseDictionary)")
+                            
+                            self.movies = responseDictionary["results"] as? [NSDictionary]
+                            
+                            // reload our table view
+                            self.tableView.reloadData()
+                            
+                            DispatchQueue.main.async {
+                                // update the refreshControl
+                                self.refreshControl.endRefreshing()
+                            }                            
+                        }
+                    } else if let error = error {
+                        print("Error: \(error)")
+                        DispatchQueue.main.async {
+                            // show the network error view
+                            self.networkErrorView.isHidden = false
+                        }
+                    }
+            });
+            task.resume()
+        } else {
+            // url is nil
+            print("url is nil!")
+        }
         
-        let task : URLSessionDataTask = session.dataTask(
-            with: request as URLRequest,
-            completionHandler: { (data, response, error) in
-                
-                // Hide HUD once the network request comes back (must be done on main UI thread)
-                DispatchQueue.main.async(execute: {
-                    MBProgressHUD.hide(for: self.view, animated: true)
-                })
-                
-                if let data = data {
-                    if let responseDictionary = try! JSONSerialization.jsonObject(
-                        with: data, options:[]) as? NSDictionary {
-                        print("responseDictionary: \(responseDictionary)")
-                        
-                        self.movies = responseDictionary["results"] as? [NSDictionary]
-                        
-                        // reload our table view
-                        self.tableView.reloadData()
-                        
-                        // update the refreshControl
-                        self.refreshControl.endRefreshing()
-                        
-                    }
-                } else if let error = error {
-                    print("Error: \(error)")
-                    DispatchQueue.main.async {
-                        // show the network error view
-                        self.networkErrorView.isHidden = false
-                    }
-                }
-        });
-        task.resume()
     }
     
     // MARK: - UIRefreshControl action
