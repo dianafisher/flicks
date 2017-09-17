@@ -34,6 +34,9 @@ class DetailViewController: UIViewController {
         let overview = movie["overview"] as? String
         overviewLabel.text = overview
         
+        // run sizeTofit on our label now that we have set the text
+        overviewLabel.sizeToFit()
+        
         let baseUrl = "http://image.tmdb.org/t/p/w500"
         
         // use if let to safely set the posterImageView image from the poster_path
