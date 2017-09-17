@@ -14,6 +14,7 @@ import MBProgressHUD
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var networkErrorView: UIView!
     
     // create an optional to hold the movies dictionary
     var movies: [NSDictionary]?
@@ -25,6 +26,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Do any additional setup after loading the view.
         tableView.dataSource = self
         tableView.delegate = self
+        
+        // hide the network error view
+        networkErrorView.isHidden = true
         
         // make the network request
         self.requestData()
@@ -77,12 +81,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                         // reload our table view
                         self.tableView.reloadData()
                         
-                        // Recall there are two fields in the response dictionary, 'meta' and 'response'.
-                        // This is how we get the 'response' field
-//                        let responseFieldDictionary = responseDictionary["response"] as! NSDictionary
-                        
-                        // This is where you will store the returned array of posts in your posts property
-                        // self.feeds = responseFieldDictionary["posts"] as! [NSDictionary]
+                    }
+                } else if let error = error {
+                    print("Error: \(error)")
+                    DispatchQueue.main.async {
+                        // show the network error view
+                        self.networkErrorView.isHidden = false
                     }
                 }
         });
