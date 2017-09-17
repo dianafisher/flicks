@@ -7,6 +7,8 @@ target 'Flicks' do
 
   # Pods for Flicks  
   pod 'AFNetworking'
+  pod 'NVActivityIndicatorView'
+  pod 'MBProgressHUD'
   
   target 'FlicksTests' do
     inherit! :search_paths

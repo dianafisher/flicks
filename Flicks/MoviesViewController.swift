@@ -8,6 +8,8 @@
 
 import UIKit
 import AFNetworking
+import NVActivityIndicatorView
+import MBProgressHUD
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
 
@@ -15,6 +17,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     // create an optional to hold the movies dictionary
     var movies: [NSDictionary]?
+    var refreshControl: UIRefreshControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +26,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         
+        // make the network request
         self.requestData()
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,9 +49,24 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             delegateQueue:OperationQueue.main
         )
         
+        //let frame = CGRect(x: 200, y: 200, width: 30, height: 30)
+        //let activityIndicator = NVActivityIndicatorView(frame: frame, type: NVActivityIndicatorType.ballScaleRippleMultiple, color: UIColor.white)
+        //activityIndicator.backgroundColor = UIColor.red
+        //self.view .addSubview(activityIndicator)
+        //activityIndicator.startAnimating()
+        
+        // Display HUD right before the request is made
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
         let task : URLSessionDataTask = session.dataTask(
             with: request as URLRequest,
             completionHandler: { (data, response, error) in
+                
+                // Hide HUD once the network request comes back (must be done on main UI thread)
+                DispatchQueue.main.async(execute: {
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                })
+                
                 if let data = data {
                     if let responseDictionary = try! JSONSerialization.jsonObject(
                         with: data, options:[]) as? NSDictionary {
