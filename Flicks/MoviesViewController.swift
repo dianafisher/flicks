@@ -184,7 +184,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         let movie = movies![indexPath.row]
         let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
+        let overview = movie["overview"] as! String        
         
         loadPosterImage(for: cell.posterView, indexPath: indexPath)
         
