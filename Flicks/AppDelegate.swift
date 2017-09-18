@@ -20,18 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         // Create the now playing navigation controller
-        let nowPlayingNavigationController = navigationControllerForEndpoint("now_playing")
-        
-        // Set the title and image of the now playing navigatinon controller
-        nowPlayingNavigationController.tabBarItem.title = "Now Playing"
-        nowPlayingNavigationController.tabBarItem.image = UIImage(named: "tickets")
-        
+        let nowPlayingNavigationController = navigationControllerForEndpoint("now_playing", title: "Now Playing", tabImage: UIImage(named: "tickets")!)
+                
         // Create the top rated navigation controller
-        let topRatedNavigationController = navigationControllerForEndpoint("top_rated")
-        
-        // Set the title and image of the top rated navigatinon controller
-        topRatedNavigationController.tabBarItem.title = "Top Rated"
-        topRatedNavigationController.tabBarItem.image = UIImage(named: "star")
+        let topRatedNavigationController = navigationControllerForEndpoint("top_rated", title: "Top Rated", tabImage: UIImage(named: "star")!)
         
         // Create a tab bar controller.
         let tabBarController = UITabBarController()
@@ -51,14 +43,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /*
      Creates a UINavigationController for the specified endpoint
      */
-    func navigationControllerForEndpoint(_ endpoint: String) -> UINavigationController {
+    func navigationControllerForEndpoint(_ endpoint: String, title: String, tabImage: UIImage) -> UINavigationController {
         // Get our storyboard
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         
         let navigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
-        let viewController = navigationController.topViewController as! MoviesViewController
         
+        // Set the title and image of the navigatinon controller
+        navigationController.tabBarItem.title = title
+        navigationController.tabBarItem.image = tabImage
+        
+        let viewController = navigationController.topViewController as! MoviesViewController
         viewController.endpoint = endpoint        
+        viewController.navTitle = title
         
         return navigationController
     }

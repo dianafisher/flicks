@@ -15,11 +15,11 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var overviewLabel: UILabel!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var infoView: UIView!
+    @IBOutlet weak var releaseDateLabel: UILabel!
+    
     
     var movie: NSDictionary!  // implicitly unwrapped
-    
-    
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -30,6 +30,9 @@ class DetailViewController: UIViewController {
         
         let title = movie["title"] as? String
         titleLabel.text = title
+        
+        let releaseDate = movie["release_date"] as? String ?? "Not Provided"
+        releaseDateLabel.text = "Released: \(releaseDate)"
         
         let overview = movie["overview"] as? String
         overviewLabel.text = overview
@@ -46,14 +49,12 @@ class DetailViewController: UIViewController {
             posterImageView.setImageWith(imageUrl! as URL)
         }
         
-        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
 
     /*
     // MARK: - Navigation

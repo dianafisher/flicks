@@ -22,6 +22,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var refreshControl: UIRefreshControl!
     var segmentedControl: UISegmentedControl!
     var endpoint: String!
+    var navTitle: String!
     let apiKey:String = "9c8b8a24a248fed2e25eb1f8d2f29d13"
     
     let itemsPerRow: CGFloat = 2
@@ -54,6 +55,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // add the segmented control to the navigation bar
         let segmentedButton = UIBarButtonItem(customView: segmentedControl)
         navigationItem.rightBarButtonItem = segmentedButton
+        
+        navigationItem.title = navTitle
         
         // add the refresh control to the table view
         tableView.refreshControl = refreshControl
