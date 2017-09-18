@@ -43,6 +43,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // initialize a UIRefreshControl
         refreshControl = UIRefreshControl()
         
+        // set the background color and tint of the refresh control
+        refreshControl.backgroundColor = UIColor.black
+        refreshControl.tintColor = UIColor(red: 1, green: 0.8, blue: 0, alpha: 1.0)
+        
         // bind refreshControlAction as the target for our refreshControl
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
         

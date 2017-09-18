@@ -28,6 +28,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Create a tab bar controller.
         let tabBarController = UITabBarController()
         
+        // Set the tint and background image of the tab bar
+        tabBarController.tabBar.tintColor = UIColor(red: 1, green: 0.8, blue: 0, alpha: 1.0)
+        tabBarController.tabBar.backgroundImage = UIImage(named: "nav-bar")
+        
         // Link each navigation controller
         tabBarController.viewControllers = [nowPlayingNavigationController, topRatedNavigationController]
         
@@ -49,13 +53,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let navigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
         
-        // Set the title and image of the navigatinon controller
+        // Set the background image
+        let navigationBar = navigationController.navigationBar        
+        navigationBar.setBackgroundImage(UIImage(named: "nav-bar"), for: .default)
+        
+        let shadow = NSShadow()
+        shadow.shadowColor = UIColor.gray.withAlphaComponent(0.5)
+        shadow.shadowOffset = CGSize.init(width: 2, height: 2)
+        shadow.shadowBlurRadius = 4
+        navigationBar.titleTextAttributes = [
+            NSFontAttributeName : UIFont.boldSystemFont(ofSize: 22),
+            NSForegroundColorAttributeName : UIColor(red: 1, green: 0.8, blue: 0, alpha: 0.8),
+            NSShadowAttributeName : shadow
+        ]
+        
+        
+        // Set the title and image of the navigatinon controller tab bar item
         navigationController.tabBarItem.title = title
         navigationController.tabBarItem.image = tabImage
         
         let viewController = navigationController.topViewController as! MoviesViewController
         viewController.endpoint = endpoint        
         viewController.navTitle = title
+        viewController.view.backgroundColor = UIColor.black
         
         return navigationController
     }
