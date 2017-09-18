@@ -24,6 +24,6 @@ Notes:
 
 Walkthrough of all user stories:
 
-https://github.com/dianafisher/flicks/blob/master/flicks.gif
+<img src='https://github.com/dianafisher/flicks/blob/master/flicks.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
