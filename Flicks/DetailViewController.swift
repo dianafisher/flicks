@@ -25,9 +25,7 @@ class DetailViewController: UIViewController {
 
         // set the content size of our scroll view
         scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
-        
-        print(movie)
-        
+                
         let title = movie["title"] as? String
         titleLabel.text = title
         
@@ -40,21 +38,65 @@ class DetailViewController: UIViewController {
         // run sizeTofit on our label now that we have set the text
         overviewLabel.sizeToFit()
         
-        let baseUrl = "http://image.tmdb.org/t/p/w500"
-        
-        // use if let to safely set the posterImageView image from the poster_path
-        if let posterPath = movie["poster_path"] as? String {
-            // posterPath is now guaranteed to not be nil.
-            let imageUrl = NSURL(string: baseUrl + posterPath)
-            posterImageView.setImageWith(imageUrl! as URL)
-        }
-        
+        // load the poster image
+        loadPosterImage(for: posterImageView, movie: movie)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    // MARK: - Utils
+    
+    // Loads low resolution poster image first and then switches to the high resolution version
+    func loadPosterImage(for imageView: UIImageView, movie: NSDictionary) {
+        
+        let lowResBaseUrl = "http://image.tmdb.org/t/p/w154"
+        let baseUrl = "http://image.tmdb.org/t/p/w500"
+        
+        if let posterPath = movie["poster_path"] as? String {
+            // posterPath is now guaranteed to not be nil.
+            
+            let lowResUrl = NSURL(string: lowResBaseUrl + posterPath)
+            let highResUrl = NSURL(string: baseUrl + posterPath)
+            
+            let highResImageRequest = NSURLRequest(url: highResUrl! as URL)
+            let lowResImageRequest = NSURLRequest(url: lowResUrl! as URL)
+            
+            imageView.setImageWith(
+                lowResImageRequest as URLRequest,
+                placeholderImage: nil,
+                success: { (lowResImageRequest, lowResImageResponse, lowResImage) in
+                    
+                    imageView.alpha = 0
+                    imageView.image = lowResImage
+                    
+                    UIView.animate(withDuration: 0.3, animations: {
+                        imageView.alpha = 1.0
+                    }, completion: { (success) in
+                        imageView.setImageWith(
+                            highResImageRequest as URLRequest,
+                            placeholderImage: lowResImage,
+                            success: { (highResImageRequest, highResImageResponse, highResImage) in
+                                imageView.image = highResImage
+                                
+                        }, failure: { (request, response, error) in
+                            print(error)
+                        })
+                    })
+                    
+            }, failure: { (request, response, error) in
+                // log error message
+                print("Error: \(error)")
+            })
+            
+            
+        }
+        
+        
+    }
+
 
     /*
     // MARK: - Navigation

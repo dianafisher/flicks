@@ -14,8 +14,8 @@ Completed user stories:
 * [x] Optional: Add a tab bar for Now Playing or Top Rated movies.
 * [x] Optional: Implement a UISegmentedControl to switch between a list view and a grid view.
 * [ ] Optional: Add a search bar.
-* [ ] Optional: All images fade in as they are loading. 
-* [ ] Optional: For the large poster, load the low-res image first and switch to high-res when complete.
+* [x] Optional: All images fade in as they are loading. 
+* [x] Optional: For the large poster, load the low-res image first and switch to high-res when complete.
 * [x] Optional: Customize the highlight and selection effect of the cell.
 * [x] Optional: Customize the navigation bar.
 

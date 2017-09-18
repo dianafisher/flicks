@@ -93,8 +93,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         if let url = URL(string:"https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)")
         {
             let request = URLRequest(url: url)
+            
             // Display HUD right before the request is made
             MBProgressHUD.showAdded(to: self.view, animated: true)
+            
+            // hide the network error view
+            self.networkErrorView.isHidden = true
             
             let task : URLSessionDataTask = session.dataTask(
                 with: request as URLRequest,
@@ -108,7 +112,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     if let data = data {
                         if let responseDictionary = try! JSONSerialization.jsonObject(
                             with: data, options:[]) as? NSDictionary {
-                            print("responseDictionary: \(responseDictionary)")
+                            
+                            //print("responseDictionary: \(responseDictionary)")
                             
                             self.movies = responseDictionary["results"] as? [NSDictionary]
                             
@@ -150,8 +155,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func selectedSegmentDidChange(_ segmentedControl: UISegmentedControl) {
         let selectedIndex = segmentedControl.selectedSegmentIndex
-        print("new selected index: \(selectedIndex)")
-        
+                
         if (selectedIndex == 0) {
             // show the table view
             tableView.isHidden = false
@@ -182,35 +186,63 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
-        let baseUrl = "http://image.tmdb.org/t/p/w500"
-        
-        // use if let to safely set the image view from the poster_path
-        if let posterPath = movie["poster_path"] as? String {
-            // posterPath is now guaranteed to not be nil.
-            let imageUrl = NSURL(string: baseUrl + posterPath)
-            cell.posterView.setImageWith(imageUrl! as URL)
-        }
+        loadPosterImage(for: cell.posterView, indexPath: indexPath)
         
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
-        
-         
+                 
         return cell
     }
     
     // MARK: - Utils
     
-    func posterUrl(for indexPath: IndexPath) -> NSURL? {
+    // Loads low resolution poster image first and then switches to the high resolution version
+    func loadPosterImage(for imageView: UIImageView, indexPath: IndexPath) {
         let movie = movies![indexPath.row]
-        let baseUrl = "http://image.tmdb.org/t/p/w500"
         
-        // use if let to safely set the image view from the poster_path
+        let lowResBaseUrl = "http://image.tmdb.org/t/p/w154"
+        let baseUrl = "http://image.tmdb.org/t/p/w500"
+
         if let posterPath = movie["poster_path"] as? String {
             // posterPath is now guaranteed to not be nil.
-            let imageUrl = NSURL(string: baseUrl + posterPath)
-            return imageUrl
+            
+            let lowResUrl = NSURL(string: lowResBaseUrl + posterPath)
+            let highResUrl = NSURL(string: baseUrl + posterPath)
+            
+            let highResImageRequest = NSURLRequest(url: highResUrl! as URL)
+            let lowResImageRequest = NSURLRequest(url: lowResUrl! as URL)
+            
+            imageView.setImageWith(
+                    lowResImageRequest as URLRequest,
+                    placeholderImage: nil,
+                    success: { (lowResImageRequest, lowResImageResponse, lowResImage) in
+                        
+                        imageView.alpha = 0
+                        imageView.image = lowResImage
+                        
+                        UIView.animate(withDuration: 0.3, animations: { 
+                            imageView.alpha = 1.0
+                        }, completion: { (success) in
+                            imageView.setImageWith(
+                                highResImageRequest as URLRequest,
+                                placeholderImage: lowResImage,
+                                success: { (highResImageRequest, highResImageResponse, highResImage) in
+                                    imageView.image = highResImage
+                                
+                            }, failure: { (request, response, error) in
+                                print("Error: \(error)")
+                            })
+                        })
+                        
+                }, failure: { (request, response, error) in
+                    // log error message
+                    print("Error: \(error)")
+                })
+            
+            
         }
-        return nil
+        
+
     }
     
     
@@ -248,10 +280,9 @@ extension MoviesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MovieCollectionViewCell", for: indexPath)  as! MovieCollectionViewCell
-        cell.backgroundColor = UIColor.red
+        cell.backgroundColor = UIColor.darkGray
         
-        let imageUrl = posterUrl(for: indexPath)
-        cell.posterImage.setImageWith(imageUrl! as URL)
+        loadPosterImage(for: cell.posterImage, indexPath: indexPath)
 
         return cell
     }
